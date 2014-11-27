@@ -306,6 +306,9 @@ At this point we would start investigating the differences we see between
 individual anticodons and amino acid types, write up a paper about it, and
 submit it to *Cell*. Good luck.
 
+(Thanks to [Nils][] and [Maria][] for help with ggplot2, which I know nothing
+about.)
+
 <!-- References -->
 
 [source]: ./deseq.rmd
@@ -313,3 +316,5 @@ submit it to *Cell*. Good luck.
 [knitr]: http://yihui.name/knitr/
 [DESeq2]: http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html
 [dplyr]: http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html
+[Nils]: https://github.com/koelling
+[Maria]: https://github.com/mxenoph
