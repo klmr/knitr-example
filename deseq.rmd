@@ -50,6 +50,7 @@ heatmap.2 = function (...)
     gplots::heatmap.2(..., trace = 'none', density.info = 'none',
               col = divergent_colors)
 
+# More elegant box plot.
 boxplot = function (..., col) {
     # Plot very narrow, minimal boxes.
     pars = list(boxwex = 0.4, staplewex = 0,
@@ -60,7 +61,7 @@ boxplot = function (..., col) {
     graphics::boxplot(..., pars = pars)
 }
 
-# dplyr helper function
+# dplyr helper function.
 add_rownames = function(df, var = 'rowname') {
     stopifnot(is.data.frame(df))
     rowname_df = setNames(data_frame(rownames(df)), var)
@@ -77,7 +78,7 @@ Introduction
 This is an example document showing how [knitr][] can aid making biological
 analysis easier to understand and reproduce. Do make sure to read [the source
 code][source] of this document as well, since it shows how to write knitr source
-code. This document was created using
+code. This document was created using the command
 
 ```{r eval=FALSE}
 knitr::knit2html('deseq.rmd')
@@ -90,6 +91,9 @@ The data used in this project is from [*Schmitt, Rudolph & al.* (Genome Res
 2014)][Schmitt2014]. We use [DESeq2][] to analyse changes of tRNA gene
 expression over several stages of mouse embryonic development. For a full
 description of the data, please refer to the above-mentioned paper.
+
+First look at the data
+----------------------
 
 To start off the analysis, let’s examine the data. We can do this in a terminal
 and/or third party applications but we can also do it directly in R. The data
@@ -180,6 +184,9 @@ eps = min(counts[counts > 0])
 boxplot(counts + eps, las = 2, log = 'y', col = tissue_colors[design$Tissue])
 ```
 
+Comparison between samples
+--------------------------
+
 Next, we can calculate similarities between our samples and plot those.
 
 ```{r}
@@ -211,24 +218,26 @@ dds = DESeq(de_count_data)
 plotDispEsts(dds)
 res = results(dds)
 plotMA(res, alpha = 0.05)
-res = res %>% as.data.frame() %>% add_rownames('Gene')
 ```
 
 The DESeq2 vignette explains the function of these plots in detail; the
 important part for us re the red dots in the second plot – these correspond to
 significantly differentially expressed tRNA genes, at the 5% significance level.
 The number of these genes is `r sum(! is.na(res$padj) & res$padj <= 0.05)` (out
-of `r nrow(res)`). The top genes (by FDR-adjusted p-value) are:
+of `r nrow(res)`). The top genes (by FDR-adjusted *p*-value) are:
 
 ```{r}
-res %>%
-    arrange(padj) %>%
+res = res %>% as.data.frame() %>% add_rownames('Gene')
+res %>% arrange(padj) %>%
     select(Gene,
            `Base mean` = baseMean,
            `log2 Fold change` = log2FoldChange,
            `Adjusted p` = padj) %>%
     head()
 ```
+
+Relating the data to biological features
+----------------------------------------
 
 We can now use the tRNA gene annotation to find out which anticodons are
 over-represented amongst the significantly differentially expressed genes.
@@ -289,6 +298,9 @@ ggplot(codons_plot_data,
     scale_color_manual(values = tissue_colors) +
     theme_bw()
 ```
+
+Closing remark
+--------------
 
 At this point we would start investigating the differences we see between
 individual anticodons and amino acid types, write up a paper about it, and
