@@ -388,7 +388,7 @@ about.)
 
 <!-- References -->
 
-[source]: ./deseq.rmd
+[source]: ./deseq.rmd?raw=true
 [Schmitt2014]: http://www.genome.org/cgi/doi/10.1101/gr.176784.114
 [knitr]: http://yihui.name/knitr/
 [DESeq2]: http://www.bioconductor.org/packages/release/bioc/html/DESeq2.html
