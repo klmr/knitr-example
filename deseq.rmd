@@ -42,14 +42,6 @@ opts_chunk$set(render = function (object, ...) {
         print(object)
 })
 
-# Change plotting defaults.
-knit_hooks$set(nice = function (before, options, envir) {
-    if (before) {
-        # Prettify plotting slightly
-        par(las = 1)
-    }
-})
-
 # Color scheme for divergent colors.
 divergent_colors = colorRampPalette(c('#603D71', 'white', '#A4B962'))(30)
 
