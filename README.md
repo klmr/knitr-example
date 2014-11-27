@@ -12,4 +12,3 @@ knitr::knit2html('deseq.rmd')
 [knitr]: http://yihui.name/knitr/
 [output]: ./deseq.md
 [source]: ./deseq.rmd?raw=true
-
