@@ -111,9 +111,16 @@ colnames(design) = c('Library', 'Antibody', 'Tissue', 'Stage')
 head(design)
 ```
 
-We’re dealing with a ChIP dataset for pol III expression. Since we are
-interested in comparing gene expression between different conditions, the input
-libraries are not relevant for now, so we filter them out.
+We’re dealing with a ChIP-seq dataset, which was created using an antibody for
+a subunit of the polymerase III complex. The study by *Schmitt, Rudolph & al.*
+used active binding of pol III as a measure of gene expression activity for
+tRNA genes, since it is known that binding of pol III to tRNA gene regions
+correlates very well with gene expression strength.
+
+So although this is a ChIP-seq dataset, the read counts actually quantify gene
+expression, more akin to RNA-seq data. Since we are interested in comparing
+gene expression between different conditions, the input libraries are not
+relevant for now, so we filter them out.
 
 For data manipulation, I recommend the excellend [dplyr][] library. It’s fast
 becoming established as a *de facto* standard, and it produces very readable
