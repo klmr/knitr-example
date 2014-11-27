@@ -298,6 +298,10 @@ ggplot(codons_plot_data,
     theme_bw()
 ```
 
+At this point we would start investigating the differences we see between
+individual anticodons and amino acid types, write up a paper about it, and
+submit it to *Cell*. Good luck.
+
 <!-- References -->
 
 [source]: ./deseq.rmd
