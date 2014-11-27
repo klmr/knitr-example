@@ -307,7 +307,7 @@ ggplot(codons_plot_data,
        aes(x = Codon, xend = Codon, y = 0, yend = Value, color = Tissue)) +
     geom_segment(size = 3) +
     coord_flip() +
-    scale_color_manual(values = tissue_colors, labels = names(tissue_colors)) +
+    scale_color_manual(values = tissue_colors) +
     theme_bw()
 ```
 
