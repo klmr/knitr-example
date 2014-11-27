@@ -2,7 +2,7 @@
 # This chunk contains some setup which we do not want to display in the final
 # document, hence `echo=FALSE` is used.
 # When you’re reading this document, it may be easier to ignore this chunk for
-# now, and continue with the document below.
+# now, and continue with the document below, starting at “Introduction”
 
 # Make library loading silent
 library = function (...) suppressMessages(base::library(...))
