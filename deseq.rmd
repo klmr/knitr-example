@@ -154,12 +154,17 @@ In order to compare count data of different libraries, we need to normalise
 their counts to account for library size effects. In order to see why this is
 the case, let’s look at the distribution of the counts across libraries:
 
-```{r nice=TRUE}
+```{r nice=TRUE, fig.width=9}
 # Color the libraries by their tissue identity.
 tissue_colors = c(brain = '#C47E1F', liver = '#7C0D0C')
 
+layout(matrix(c(1, 2), nrow = 1), widths = c(0.8, 0.2))
+par(mar = c(5, 4, 4, 2) + 0.1)
 # Pseudocount 1, because zeros would break log y axis.
 boxplot(counts + 1, las = 2, log = 'y', col = tissue_colors[design$Tissue])
+par(mar = c(5, 0, 4, 2) + 0.1)
+plot.new()
+legend('center', bty = 'n', legend = names(tissue_colors), fill = tissue_colors)
 ```
 
 … the library sizes are all over the place! This is due to technical variation
@@ -175,13 +180,20 @@ compare later. We ignore it for now.
 
 Now we can run the library size normalisation on this.
 
-```{r nice=TRUE}
+```{r nice=TRUE, fig.width=9}
 de_count_data = estimateSizeFactors(de_count_data)
 counts = counts(de_count_data, normalized = TRUE)
 # DESeq2 removes column names, we need to re-set them.
 colnames(counts) = design$Library[lib_indices]
+# Use global minimum value > 0 as pseudocount.
 eps = min(counts[counts > 0])
+
+layout(matrix(c(1, 2), nrow = 1), widths = c(0.8, 0.2))
+par(mar = c(5, 4, 4, 2) + 0.1)
 boxplot(counts + eps, las = 2, log = 'y', col = tissue_colors[design$Tissue])
+par(mar = c(5, 0, 4, 2) + 0.1)
+plot.new()
+legend('center', bty = 'n', legend = names(tissue_colors), fill = tissue_colors)
 ```
 
 Comparison between samples
@@ -207,6 +219,8 @@ plot(pcs$rotation[, 1], pcs$rotation[, 2],
      col = tissue_colors[design$Tissue], pch = 1,
      xlab = sprintf('PC1 (%.0f%% variance)', explained_variance[1] * 100),
      ylab = sprintf('PC2 (%.0f%% variance)', explained_variance[2] * 100))
+legend('topleft', bty = 'n', legend = names(tissue_colors),
+       fill = tissue_colors)
 ```
 
 Next, it makes sense to look at which genes cause this difference **between the
