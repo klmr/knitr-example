@@ -6,8 +6,8 @@ Genomic analysis using R and knitr
 Introduction
 ------------
 
-This is an example document showing how [knitr][] can aid making biological
-analysis easier to understand and reproduce. Do make sure to read [the source
+This is an example document showing how [knitr][] can make biological analysis
+easier to understand and reproduce. Do make sure to read [the source
 code][source] of this document as well, since it shows how to write knitr source
 code. This document was created using the command
 
@@ -21,8 +21,8 @@ simple gene expression analysis.
 
 The data used in this project is from [*Schmitt, Rudolph & al.* (Genome Res
 2014)][Schmitt2014]. We use [DESeq2][] to analyse changes of tRNA gene
-expression over several stages of mouse embryonic development. For a full
-description of the data, please refer to the above-mentioned paper.
+expression across two tissues and several stages of mouse embryonic development.
+For a full description of the data, please refer to the above-mentioned paper.
 
 First look at the data
 ----------------------
@@ -60,13 +60,14 @@ head(design)
 | do1538    | PolIII     | brain    | e18.5   |
 | do1539    | PolIII     | brain    | P0.5    |
 
-We’re dealing with ChIP dataset for polIII expression. Since we are interested
-in comparing gene expression between different conditions, the input libraries
-are not relevant for now, so we filter them out.
+We’re dealing with a ChIP dataset for pol III expression. Since we are
+interested in comparing gene expression between different conditions, the input
+libraries are not relevant for now, so we filter them out.
 
 For data manipulation, I recommend the excellend [dplyr][] library. It’s fast
-becoming established as a de facto standard, and it produces very readable code.
-For instance, the following simply filters our data frame by a given criterion.
+becoming established as a *de facto* standard, and it produces very readable
+code by chaining several operations on the same data via the `%>%` operator. For
+instance, the following simply filters our data frame by a given criterion.
 
 
 ```r
@@ -87,9 +88,9 @@ head(design)
 | do1541    | PolIII     | brain    | P4      |
 | do1550    | PolIII     | liver    | P22     |
 
-Next, we load the actual count data of the libraries, and drop all the input
-libraries right away. since it’s big, we only print a subset of the columns to
-get an idea of its layout:
+Next, we load the actual count data of the sequencing libraries, and drop all
+the input libraries right away. Since there are many columns, we only print a
+subset to get an idea of the data layout:
 
 
 ```r
@@ -110,6 +111,9 @@ counts[1 : 6, 1 : 6]
 | **chr1.trna1005**   |      192 |      219 |      102 |       65 |      491 |     1670 |
 | **chr1.trna1006**   |      511 |      584 |      247 |       99 |     1012 |     3020 |
 
+DESeq
+-----
+
 Now it’s time to bring out a library to work with expression count data:
 
 
@@ -127,7 +131,7 @@ vignette('DESeq2')
 
 In order to compare count data of different libraries, we need to normalise
 their counts to account for library size effects. In order to see why this is
-the case, let’s look at the distribution of the counts across libraries:
+the case, let’s look at the distribution of the raw counts across libraries:
 
 
 ```r
@@ -136,7 +140,7 @@ tissue_colors = c(brain = '#C47E1F', liver = '#7C0D0C')
 
 layout(matrix(c(1, 2), nrow = 1), widths = c(0.8, 0.2))
 par(mar = c(5, 4, 4, 2) + 0.1)
-# Pseudocount 1, because zeros would break log y axis.
+# Add pseudocount 1, because zeros would break log y axis.
 boxplot(counts + 1, las = 2, log = 'y', col = tissue_colors[design$Tissue])
 par(mar = c(5, 0, 4, 2) + 0.1)
 plot.new()
@@ -145,9 +149,10 @@ legend('center', bty = 'n', legend = names(tissue_colors), fill = tissue_colors)
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
-… the library sizes are all over the place! This is due to technical variation
-during sequencing that we cannot influence. Normalisation takes care of this.
-But this requires us first to put the data into a DESeq2 analysis object.
+… the count distributions differ drastically between libraries! This is due to
+technical variation during sequencing that we cannot influence. Normalisation
+takes care of this. But this requires us first to put the data into a DESeq2
+analysis object.
 
 
 ```r
@@ -160,7 +165,7 @@ de_count_data = DESeqDataSetFromMatrix(counts, design, design = ~Tissue)
 ```
 
 The last parameter in the above call already specifies what we are going to
-compare later. We ignore it for now.
+contrast later. We ignore it for now.
 
 Now we can run the library size normalisation on this.
 
@@ -170,11 +175,11 @@ de_count_data = estimateSizeFactors(de_count_data)
 counts = counts(de_count_data, normalized = TRUE)
 # DESeq2 removes column names, we need to re-set them.
 colnames(counts) = design$Library[lib_indices]
-# Use global minimum value > 0 as pseudocount.
-eps = min(counts[counts > 0])
 
 layout(matrix(c(1, 2), nrow = 1), widths = c(0.8, 0.2))
 par(mar = c(5, 4, 4, 2) + 0.1)
+# Use global minimum value > 0 as pseudocount.
+eps = min(counts[counts > 0])
 boxplot(counts + eps, las = 2, log = 'y', col = tissue_colors[design$Tissue])
 par(mar = c(5, 0, 4, 2) + 0.1)
 plot.new()
@@ -217,8 +222,9 @@ legend('topleft', bty = 'n', legend = names(tissue_colors),
 ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
 
 Next, it makes sense to look at which genes cause this difference **between the
-tissues** (this is what we specified with the `design = ~Tissue` argument
-earlier).
+tissues** by performing differential expression analysis using tissue identity
+of each library as the contrast (this is what we specified with the `design =
+~Tissue` argument earlier).
 
 
 ```r
@@ -248,10 +254,10 @@ plotMA(res, alpha = 0.05)
 ![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-2.png) 
 
 The DESeq2 vignette explains the function of these plots in detail; the
-important part for us re the red dots in the second plot – these correspond to
+important part for us are the red dots in the second plot – these correspond to
 significantly differentially expressed tRNA genes, at the 5% significance level.
-The number of these genes is 168 (out
-of 433). The top genes (by FDR-adjusted *p*-value) are:
+The number of these differentially expressed genes is 168 (out of 433). The top hits (by FDR-adjusted
+*p*-value) are:
 
 
 ```r
@@ -305,8 +311,8 @@ head(annotation)
 | chr1.trna1005 | GTC     | Asp  | chr1  | 1.73e+08 | 1.73e+08 |
 | chr1.trna1006 | GTT     | Asn  | chr1  | 1.73e+08 | 1.73e+08 |
 
-To find the most differentially expressed genes per codon, we
-merge these two tables and group by codon type.
+To find the number of differentially expressed genes per codon, we merge these
+two tables and group by codon type.
 
 
 ```r
@@ -316,7 +322,6 @@ differential_codons = inner_join(res, annotation, by = 'Gene') %>%
     summarize(AA = first(AA),
               brain = sum(log2FoldChange > 0),
               liver = sum(log2FoldChange < 0))
-              
 
 head(differential_codons)
 ```
@@ -332,8 +337,11 @@ head(differential_codons)
 | ACG     | Arg  |       3 |       0 |
 | AGA     | Ser  |       3 |       1 |
 
-Let’s visualise this more nicely. For that, we need to re-shape the data an pass
-it to `ggplot`, which provides more powerful visualisation capabilities.
+This table shows the number of overrepresented genes for brain and liver,
+respectively.
+
+Let’s visualise this more nicely. For that, we need to re-shape the data and
+pass it to `ggplot`, which provides more powerful visualisation capabilities.
 
 
 ```r
