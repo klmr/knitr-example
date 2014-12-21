@@ -44,8 +44,8 @@ Let’s have a look at the library design.
 
 
 ```r
-design = read.csv('./data/library-design.tsv', sep = '\t', header = FALSE)
-colnames(design) = c('Library', 'Antibody', 'Tissue', 'Stage')
+design = read.delim('./data/library-design.tsv', header = FALSE,
+                    col.names = c('Library', 'Antibody', 'Tissue', 'Stage'))
 head(design)
 ```
 
@@ -101,7 +101,7 @@ subset to get an idea of the data layout:
 
 
 ```r
-counts = read.csv('./data/trna-counts.tsv', sep = '\t', row.names = 1)
+counts = read.delim('./data/trna-counts.tsv', row.names = 1)
 lib_indices = match(colnames(counts), design$Library)
 counts = counts[, lib_indices]
 counts[1 : 6, 1 : 6]
@@ -296,7 +296,7 @@ over-represented amongst the significantly differentially expressed genes.
 
 
 ```r
-annotation = read.csv('./data/trna-annotation.tsv', sep = '\t', header = FALSE)
+annotation = read.delim('./data/trna-annotation.tsv', header = FALSE)
 
 # The data is messy. Remove redundant spaces etc.
 annotation = annotation %>%
