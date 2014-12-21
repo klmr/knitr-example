@@ -227,7 +227,7 @@ analysis on this data set:
 ```{r nice=TRUE}
 pcs = prcomp(correlated)
 explained_variance = summary(pcs)$importance['Proportion of Variance', ]
-plot(pcs$rotation[, 1], pcs$rotation[, 2],
+plot(PC2 ~ PC1, pcs$x,
      col = tissue_colors[design$Tissue], pch = 1,
      xlab = sprintf('PC1 (%.0f%% variance)', explained_variance[1] * 100),
      ylab = sprintf('PC2 (%.0f%% variance)', explained_variance[2] * 100))

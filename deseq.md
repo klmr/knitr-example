@@ -128,6 +128,14 @@ Now it’s time to bring out a library to work with expression count data:
 library(DESeq2)
 ```
 
+```
+## Warning: package 'Rcpp' was built under R version 3.1.1
+```
+
+```
+## Warning: package 'RcppArmadillo' was built under R version 3.1.2
+```
+
 For a detailed description of DESeq2, refer to the vignette, using the R
 command
 
@@ -203,6 +211,13 @@ Next, we can calculate similarities between our samples and plot those.
 
 ```r
 library(gplots)
+```
+
+```
+## Warning: package 'gplots' was built under R version 3.1.1
+```
+
+```r
 correlated = cor(counts, method = 'spearman')
 heatmap.2(correlated, ColSideColors = tissue_colors[design$Tissue])
 ```
@@ -218,7 +233,7 @@ analysis on this data set:
 ```r
 pcs = prcomp(correlated)
 explained_variance = summary(pcs)$importance['Proportion of Variance', ]
-plot(pcs$rotation[, 1], pcs$rotation[, 2],
+plot(PC2 ~ PC1, pcs$x,
      col = tissue_colors[design$Tissue], pch = 1,
      xlab = sprintf('PC1 (%.0f%% variance)', explained_variance[1] * 100),
      ylab = sprintf('PC2 (%.0f%% variance)', explained_variance[2] * 100))
