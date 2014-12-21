@@ -16,26 +16,17 @@ library(knitr)
 library(pander)
 
 panderOptions('table.split.table', Inf)
-
-# Auto-adjust the table column alignment depending on data type.
-alignment = function (...) UseMethod('alignment')
-alignment.default = function (...) 'left'
-alignment.integer = function (...) 'right'
-alignment.numeric = function (...) 'right'
+panderOptions('table.alignment.default',
+              function (df) ifelse(sapply(df, is.numeric), 'right', 'left'))
+panderOptions('table.alignment.rownames', 'left')
 
 # Disable code re-formatting.
 opts_chunk$set(tidy = FALSE)
 # Enable automatic table reformatting.
 opts_chunk$set(render = function (object, ...) {
     if (is.data.frame(object) ||
-        is.matrix(object)) {
-        # Replicate pander’s behaviour concerning row names
-        rn = rownames(object)
-        justify = c(if (is.null(rn) || length(rn) == 0 ||
-                        (rn == 1 : nrow(object))) NULL else 'left',
-                    sapply(object, alignment))
-        pander(object, style = 'rmarkdown', justify = justify)
-    }
+        is.matrix(object))
+        pander(object, style = 'rmarkdown')
     else if (isS4(object))
         show(object)
     else
